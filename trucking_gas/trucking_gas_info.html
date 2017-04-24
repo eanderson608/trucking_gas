@@ -1,0 +1,31 @@
+﻿<!doctype html>
+
+<script>
+	function acceptJob()
+	{
+		resourceCall("acceptJob");
+	};
+
+    function declineJob()
+	{
+		resourceCall("declineJob");
+	};
+
+</script>
+
+
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="main.css">
+</head>
+<body>
+    <!-- Add your site or application content here -->
+    <p>Do you want to accept the trucking job?</p>
+
+    <button onclick="acceptJob();" id="accept">Accept</button>
+    <button onclick="declineJob();" id="exit">Exit</button>
+</body>
+</html>

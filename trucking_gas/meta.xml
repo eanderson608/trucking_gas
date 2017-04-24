@@ -1,0 +1,18 @@
+﻿<meta>
+  <info name="trucking_gas" author="pocket" type="script" />
+
+  <script src="trucking_gas.cs" type="server" lang="csharp" />
+  <script src="trucking_gas_local.js" type="client" lang="javascript" />
+
+  <file src="main.css" />
+  <file src="trucking_gas_info.html" />
+
+  <assembly ref="Insight.Database.Configuration.dll" />
+  <assembly ref="Insight.Database.dll" />
+  <assembly ref="Insight.Database.Providers.Default.dll" />
+  <assembly ref="Insight.Database.Providers.MySql.dll" />
+  <assembly ref="MySql.Data.dll" />
+  <assembly ref="System.Globalization.dll" />
+  <assembly ref="System.Configuration.dll" />
+  <assembly ref="System.Data.dll" />
+</meta>

@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Insight.Database.Providers.MySql</name>
+    </assembly>
+    <members>
+        <member name="T:Insight.Database.Providers.MySql.MySqlInsightDbProvider">
+            <summary>
+            Implements the Insight provider for MySql connections.
+            </summary>
+        </member>
+        <member name="F:Insight.Database.Providers.MySql.MySqlInsightDbProvider._parameterPrefixRegex">
+            <summary>
+            The prefix used on parameter names.
+            </summary>
+        </member>
+        <member name="F:Insight.Database.Providers.MySql.MySqlInsightDbProvider._supportedTypes">
+            <summary>
+            The list of types supported by this provider.
+            </summary>
+        </member>
+        <member name="M:Insight.Database.Providers.MySql.MySqlInsightDbProvider.RegisterProvider">
+            <summary>
+            Registers this provider. This is generally not needed, unless you want to force an assembly reference to this provider.
+            </summary>
+        </member>
+        <member name="M:Insight.Database.Providers.MySql.MySqlInsightDbProvider.CreateDbConnection">
+            <summary>
+            Creates a new DbConnection supported by this provider.
+            </summary>
+            <returns>A new DbConnection.</returns>
+        </member>
+        <member name="M:Insight.Database.Providers.MySql.MySqlInsightDbProvider.DeriveParametersFromStoredProcedure(System.Data.IDbCommand)">
+            <summary>
+            Derives the parameter list from a stored procedure command.
+            </summary>
+            <param name="command">The command to derive.</param>
+        </member>
+        <member name="M:Insight.Database.Providers.MySql.MySqlInsightDbProvider.CloneParameter(System.Data.IDbCommand,System.Data.IDataParameter)">
+            <summary>
+            Clones a parameter so that it can be used with another command.
+            </summary>
+            <param name="command">The command to use.</param>
+            <param name="parameter">The parameter to clone.</param>
+            <returns>The clone.</returns>
+        </member>
+        <member name="M:Insight.Database.Providers.MySql.MySqlInsightDbProvider.GetTableSchemaSql(System.Data.IDbConnection,System.String)">
+            <summary>
+            Returns SQL that queries a table for the schema only, no rows.
+            </summary>
+            <param name="connection">The connection to use.</param>
+            <param name="tableName">The name of the table to query.</param>
+            <returns>SQL that queries a table for the schema only, no rows.</returns>
+        </member>
+        <member name="M:Insight.Database.Providers.MySql.MySqlInsightDbProvider.IsTransientException(System.Exception)">
+            <summary>
+            Determines if a database exception is a transient exception and if the operation could be retried.
+            </summary>
+            <param name="exception">The exception to test.</param>
+            <returns>True if the exception is transient.</returns>
+        </member>
+        <member name="P:Insight.Database.Providers.MySql.MySqlInsightDbProvider.SupportedTypes">
+            <summary>
+            Gets the types of objects that this provider supports.
+            Include connectionstrings, connections, commands, and readers.
+            </summary>
+        </member>
+    </members>
+</doc>
