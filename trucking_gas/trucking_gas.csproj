@@ -75,7 +75,10 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="main.css" />
-    <Content Include="meta.xml" />
+    <Content Include="main.js" />
+    <Content Include="meta.xml">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="trucking_gas_info.html" />
     <Content Include="trucking_gas_local.js" />
   </ItemGroup>

@@ -117,6 +117,11 @@ namespace Jobs
 
         public void OnClientEvent(Client player, string eventName, params object[] arguments)
         {
+            if (eventName == "request_delivery_info_from_server")
+            {
+                API.triggerClientEvent(player, "send_delivery_info_to_client", API.toJson(gasStations));
+            }
+
             if (eventName == "start_gas_trucking_job")
             {
                 // create vehicles

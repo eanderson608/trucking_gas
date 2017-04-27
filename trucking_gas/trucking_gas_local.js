@@ -36,6 +36,19 @@ API.onServerEventTrigger.connect(function (eventName, args) {
             playerInJobStartShape = false;
             break;
 
+        case "send_delivery_info_to_client":
+
+            playerOnJob = true;
+            var res = API.getScreenResolution();
+            jobInfoBrowser = API.createCefBrowser(res.Width / 2, res.Height / 2);
+            API.waitUntilCefBrowserInit(jobInfoBrowser);
+            API.setCefBrowserPosition(jobInfoBrowser, res.Width / 4, res.Height / 4);
+            API.loadPageCefBrowser(jobInfoBrowser, "trucking_gas_info.html");
+            API.showCursor(true);
+            API.setCanOpenChat(false);
+            jobInfoBrowser.call("displayJson", "poop");
+            break;
+
         case "send_delivery_locations_from_server":
 
             tankerHandle = args[1];
@@ -54,6 +67,7 @@ API.onServerEventTrigger.connect(function (eventName, args) {
             
             list = JSON.parse(args[0]);
             string = list[0].Type;
+            API.sendChatMessage(string.toString());
             for (var i = 0; i < list.length; i++) {
                 
                 var loc = JSON.parse(list[i].DeliverLocation);
@@ -166,10 +180,6 @@ API.onServerEventTrigger.connect(function (eventName, args) {
 
 API.onUpdate.connect(function (sender, args) {
 
-    if (jobInfoBrowser != null) {
-        jobInfoBrowser.call("displayJson", string);
-    }
-
     // display job-shape text if player is in shape and hasnt accepted job
     if (playerInJobStartShape && !playerOnJob) {
         var res_x = API.getScreenResolutionMantainRatio().Width;
@@ -234,14 +244,7 @@ API.onKeyDown.connect(function (sender, key) {
     // cef assistance from: https://forum.gtanet.work/index.php?threads/simple-cef-tutorial.1808/
     if (playerInJobStartShape && key.KeyCode === Keys.Enter) {
 
-        playerOnJob = true;
-        var res = API.getScreenResolution();
-        jobInfoBrowser = API.createCefBrowser(res.Width / 2, res.Height / 2);
-        API.waitUntilCefBrowserInit(jobInfoBrowser);
-        API.setCefBrowserPosition(jobInfoBrowser, res.Width / 4, res.Height / 4);
-        API.loadPageCefBrowser(jobInfoBrowser, "trucking_gas_info.html");
-        API.showCursor(true);
-        API.setCanOpenChat(false);        
+        API.triggerServerEvent("request_delivery_info_from_server");            
     }
 
     // handle client-side procedure for delivering gas
