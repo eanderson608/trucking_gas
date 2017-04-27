@@ -39,12 +39,16 @@ namespace Jobs
     {
 
         ColShape jobStartShape = null;
+        ColShape jobEndShape = null;
+
         List<Retailer> gasStations = null;
         ArrayList deliveryColShapes = new ArrayList();
         ArrayList contractsAsync = new ArrayList();
         ArrayList contracts;
         ArrayList tankerModels = new ArrayList();
-        
+        Vector3 jobEndPos = null;
+
+        bool tankerInJobEndShape = false;
 
         private static MySqlConnectionStringBuilder _database;
         private static IRetailerRepository _retailerRepository;
@@ -76,7 +80,7 @@ namespace Jobs
             {
                 dynamic d = API.fromJson(station.DeliverLocation);
                 Vector3 pos = new Vector3((float)d.X, (float)d.Y, (float)(d.Z - 1));
-                var shape = API.createCylinderColShape(pos, 5, 5);
+                var shape = API.createCylinderColShape(pos, 4, 8);
                 shape.setData("ID", station.Id);
 
                 // add shapes to list
@@ -91,6 +95,7 @@ namespace Jobs
             // synchronize list of contracts
             contracts = ArrayList.Synchronized(contractsAsync);
 
+            // set up start job start blip, shape, etc...
             var jobStartPos = new Vector3(1383.331, -2079.071, 51.99853 + 1);
             var jobStartTextPos = new Vector3(1383.331, -2079.071, 51.99853 + 1.5);
             jobStartShape = API.createSphereColShape(jobStartPos, 3f);
@@ -102,6 +107,12 @@ namespace Jobs
             API.setBlipSprite(jobStartBlip, 477);
             API.setBlipColor(jobStartBlip, 26);
             API.setBlipName(jobStartBlip, "Trucking Job: Gas");
+
+            // create job return shape
+            jobEndPos = new Vector3(1361, -2066, 52);
+            jobEndShape = API.createSphereColShape(jobEndPos, 4f);
+            
+
         }
 
         public void OnClientEvent(Client player, string eventName, params object[] arguments)
@@ -118,9 +129,8 @@ namespace Jobs
                 // create contract object
                 DeliveryContract contract = new DeliveryContract(player, tanker);
                 contract.addDelivery(1, 2000); // 2000 gallons to gas station with id of 1
+                _retailerRepository.AddStockEnRoute(1, 2000);
                 contracts.Add(contract);
-
-                API.sendChatMessageToPlayer(player, "you are contracted to deliver: " + contract.Deliveries);
 
                 // create list of delivery locations from contract
                 ArrayList deliveryLocs = new ArrayList();
@@ -131,7 +141,8 @@ namespace Jobs
 
                 // send delivery locations to player
                 var deliveryLocsJson = API.toJson(deliveryLocs);
-                API.triggerClientEvent(player, "send_delivery_locations_from_server", deliveryLocsJson, tanker.handle, hauler.handle);         
+                var jobEndPosJson = API.toJson(jobEndPos);
+                API.triggerClientEvent(player, "send_delivery_locations_from_server", deliveryLocsJson, tanker.handle, hauler.handle, jobEndPosJson);         
 
             }
             else if (eventName == "player_deliver_gas")
@@ -153,7 +164,7 @@ namespace Jobs
 
                 // remove delivery from contract
                 contract.removeDelivery(stationId);
-                API.sendChatMessageToPlayer(player, "deliveries remaining: " + contract.Deliveries.Count.ToString());
+                API.sendChatMessageToPlayer(player, "deliveries remaining: " + contract.Deliveries.Count.ToString());                                 
 
                 // trigger client event
                 API.triggerClientEvent(player, "player_delivered_gas", stationId);
@@ -198,10 +209,30 @@ namespace Jobs
                 var id = shape.getData("ID");
                 foreach (DeliveryContract contract in contracts)
                 {
-                    if (shape.containsEntity(contract.Player.handle) && shape.containsEntity(contract.Tanker.handle) && !contract.Player.isInVehicle && contract.Deliveries.ContainsKey(id))
+                    if (shape.containsEntity(contract.Tanker.handle) && contract.Deliveries.ContainsKey(id))
                     {
-                        API.setEntityData(contract.Player.handle, "IS_ABLE_TO_DELIVER_TO_STATION", id);
-                        API.triggerClientEvent(contract.Player, "player_can_deliver_gas", id);
+                        API.triggerClientEvent(contract.Player, "tanker_entered_delivery_shape", id);
+                        if (!contract.Player.isInVehicle && shape.containsEntity(contract.Player.handle))
+                        {
+                            API.setEntityData(contract.Player.handle, "IS_ABLE_TO_DELIVER_TO_STATION", id);
+                            API.triggerClientEvent(contract.Player, "player_can_deliver_gas", id);
+                        }
+                            
+                        break; // break loop once contract is found
+                    }
+                }
+            }
+
+            // handle process for returning tanker and ending job
+            if (shape == jobEndShape && tankerEnteredShape)
+            {
+                var id = shape.getData("ID");
+                foreach (DeliveryContract contract in contracts)
+                {
+                    if (shape.containsEntity(contract.Tanker.handle))
+                    {
+                        API.sendChatMessageToPlayer(contract.Player, "tanker enter job end");
+                        API.triggerClientEvent(contract.Player, "tanker_entered_job_end_shape");
                         break; // break loop once contract is found
                     }
                 }
@@ -221,6 +252,10 @@ namespace Jobs
             {
                 player = API.getPlayerFromHandle(entity);
             }
+            else if (tankerModels.Contains(API.getEntityModel(entity)))
+            {
+                tankerExitedShape = true;
+            }
 
             if (shape == jobStartShape && player != null)
             {
@@ -234,12 +269,35 @@ namespace Jobs
             {
                 foreach (DeliveryContract contract in contracts)
                 {
-                    if (contract.Player == player || contract.Tanker.handle == entity)
+                    // if tanker leaves shape, check to see if any part of it is inside and
+                    // if not then notify the player
+                    if (!shape.containsEntity(contract.Tanker.handle))
                     {
+                        var id = shape.getData("ID");
+                        API.triggerClientEvent(contract.Player, "tanker_exited_delivery_shape", id);
+                    }
+
+                    if (contract.Player == player || contract.Tanker.handle == entity)
+                    {                    
                         API.setEntityData(contract.Player.handle, "IS_ABLE_TO_DELIVER_TO_STATION", null);
                         API.triggerClientEvent(contract.Player, "player_cannot_deliver_gas");
                         break; // break loop once contract is found
                     }
+                }
+            }
+
+            if (shape == jobEndShape && tankerExitedShape)
+            {
+                foreach (DeliveryContract contract in contracts)
+                {
+                    // if tanker leaves shape, check to see if any part of it is inside and
+                    // if not then notify the player
+                    if (!shape.containsEntity(contract.Tanker.handle) && entity == contract.Tanker.handle)
+                    {
+                        API.sendChatMessageToPlayer(contract.Player, "tanker exit job end");
+                        API.triggerClientEvent(contract.Player, "tanker_exited_job_end_shape");
+                    }
+                    break;
                 }
             }
         }
@@ -248,15 +306,17 @@ namespace Jobs
         {
             foreach (DeliveryContract contract in contracts)
             {
-                // get the vechicle driven by player, if its trailer is the one specified
-                // in the delivery contract, send event to player
-                var playerVeh = API.getPlayerVehicle(contract.Player);
-                if (trailer == contract.Tanker && tower == playerVeh)
+                if (jobEndShape.containsEntity(contract.Tanker.handle) && API.getVehicleTraileredBy(contract.Tanker.handle).Value == 0)
                 {
-                    API.triggerClientEvent(contract.Player, "player_connects_tanker");
-                } else if (tower == playerVeh && trailer.IsNull)
-                {
-                    API.triggerClientEvent(contract.Player, "player_loses_tanker");
+                    // delete tanker
+                    API.deleteEntity(contract.Tanker.handle);
+
+                    // remove contract from list
+                    contracts.Remove(contract);
+
+                    // trigger client
+                    API.triggerClientEvent(contract.Player, "end_job");
+                    
                 }
             }
         }

@@ -9,7 +9,11 @@
     function declineJob()
 	{
 		resourceCall("declineJob");
-	};
+    };
+
+    function displayJson(json) {
+        document.getElementById("jsonContainer").innerHTML = json;
+    };
 
 </script>
 
@@ -22,10 +26,11 @@
     <link rel="stylesheet" href="main.css">
 </head>
 <body>
-    <!-- Add your site or application content here -->
+
     <p>Do you want to accept the trucking job?</p>
 
     <button onclick="acceptJob();" id="accept">Accept</button>
     <button onclick="declineJob();" id="exit">Exit</button>
+    <span id="jsonContainer"></span>
 </body>
 </html>
