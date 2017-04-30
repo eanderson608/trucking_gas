@@ -38,6 +38,7 @@ API.onServerEventTrigger.connect(function (eventName, args) {
 
         case "send_delivery_info_to_client":
 
+            string = args[0];
             playerOnJob = true;
             var res = API.getScreenResolution();
             jobInfoBrowser = API.createCefBrowser(res.Width / 2, res.Height / 2);
@@ -46,7 +47,8 @@ API.onServerEventTrigger.connect(function (eventName, args) {
             API.loadPageCefBrowser(jobInfoBrowser, "trucking_gas_info.html");
             API.showCursor(true);
             API.setCanOpenChat(false);
-            jobInfoBrowser.call("displayJson", "poop");
+            API.sleep(100);
+            jobInfoBrowser.call("displayJson", string);
             break;
 
         case "send_delivery_locations_from_server":
@@ -66,7 +68,6 @@ API.onServerEventTrigger.connect(function (eventName, args) {
             // create markers and blips for list of delivery points
             
             list = JSON.parse(args[0]);
-            string = list[0].Type;
             API.sendChatMessage(string.toString());
             for (var i = 0; i < list.length; i++) {
                 

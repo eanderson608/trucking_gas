@@ -325,6 +325,21 @@ namespace Jobs
                 }
             }
         }
+
+        [Command("add")]
+        public void addStation(Client player)
+        {
+            if (!API.isPlayerInAnyVehicle(player))
+            {
+                API.sendChatMessageToPlayer(player, "must be in vehicle");
+                return;
+            }
+
+            var veh = API.getPlayerVehicle(player);
+            var pos = API.getEntityPosition(veh);
+            var rot = API.getEntityRotation(veh).Z;
+            _retailerRepository.CreateStation(API.toJson(pos), rot);
+        }
     }
 
     public interface IRetailerRepository
@@ -333,6 +348,7 @@ namespace Jobs
         Retailer GetRetailerById(int _id);
         void AddRetailerStock(int _id, int _amount);
         void AddStockEnRoute(int _id, int _amount);
+        void CreateStation(string _deliveryPos, float _bonusRot);
     }
 
     public class Retailer

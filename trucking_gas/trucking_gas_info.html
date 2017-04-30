@@ -12,7 +12,12 @@
     };
 
     function displayJson(json) {
-        document.getElementById("jsonContainer").innerHTML = json;
+        var s = JSON.parse(json);
+        var string = "";
+        for (var entry in s) {
+            string += entry.BonusRotation;
+        }
+        document.getElementById("jsonContainer").innerHTML = string;
     };
 
 </script>

@@ -1,0 +1,10 @@
+/**
+ Export to JSON plugin for PHPMyAdmin
+ @version 4.6.4
+ */
+
+// Database 'gtanserver'
+
+// gtanserver.retailers
+
+[{"id":"1","name":null,"type":"GAS_STATION","deliverlocation":"{\"X\": 1198.159, \"Y\": -1391.21, \"Z\": 35.22986}","purchaselocation":"{\"X\": 1198.159, \"Y\": -1391.21, \"Z\": 35.22986}","stock":"42305","capacity":"5000","stockenroute":"180000","bonusrotation":"180"}, {"id":"2","name":null,"type":"GAS_STATION","deliverlocation":"{\"X\":171.0107, \"Y\": -1556.199, \"Z\" : 29.2293}","purchaselocation":"{\"X\":171.0107, \"Y\": -1556.199, \"Z\" : 29.2293}","stock":"1007","capacity":"5000","stockenroute":"0","bonusrotation":"0"}, {"id":"4","name":null,"type":"GAS_STATION","deliverlocation":"{\"X\":2548.74634,\"Y\":343.01178,\"Z\":108.460831}","purchaselocation":null,"stock":"1000","capacity":"5000","stockenroute":"0","bonusrotation":"-94"}, {"id":"5","name":null,"type":"GAS_STATION","deliverlocation":"{\"X\":2656.80737,\"Y\":3275.685,\"Z\":55.23778}","purchaselocation":null,"stock":"1000","capacity":"5000","stockenroute":"0","bonusrotation":"154"}, {"id":"6","name":null,"type":"GAS_STATION","deliverlocation":"{\"X\":1695.00439,\"Y\":4915.60254,\"Z\":42.0748329}","purchaselocation":null,"stock":"1000","capacity":"5000","stockenroute":"0","bonusrotation":"54"}]
